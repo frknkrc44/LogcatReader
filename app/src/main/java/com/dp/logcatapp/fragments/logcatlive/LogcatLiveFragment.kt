@@ -1,10 +1,8 @@
 package com.dp.logcatapp.fragments.logcatlive
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.IBinder
 import android.view.LayoutInflater
@@ -24,7 +22,6 @@ import com.dp.logcat.Filter
 import com.dp.logcat.Log
 import com.dp.logcat.Logcat
 import com.dp.logcat.LogsReceivedListener
-import com.dp.logcatapp.BuildConfig
 import com.dp.logcatapp.R
 import com.dp.logcatapp.activities.BaseActivityWithToolbar
 import com.dp.logcatapp.activities.FiltersActivity
@@ -32,30 +29,23 @@ import com.dp.logcatapp.activities.SavedLogsActivity
 import com.dp.logcatapp.db.FilterInfo
 import com.dp.logcatapp.fragments.base.BaseFragment
 import com.dp.logcatapp.fragments.filters.FilterType
-import com.dp.logcatapp.fragments.logcatlive.dialogs.AskingForRootAccessDialogFragment
-import com.dp.logcatapp.fragments.logcatlive.dialogs.ManualMethodToGrantPermissionDialogFragment
-import com.dp.logcatapp.fragments.logcatlive.dialogs.NeedPermissionDialogFragment
 import com.dp.logcatapp.fragments.logcatlive.dialogs.OnSavedBottomSheetDialogFragment
-import com.dp.logcatapp.fragments.logcatlive.dialogs.RestartAppMessageDialogFragment
 import com.dp.logcatapp.fragments.shared.dialogs.CopyToClipboardDialogFragment
 import com.dp.logcatapp.fragments.shared.dialogs.FilterExclusionDialogFragment
 import com.dp.logcatapp.services.LogcatService
 import com.dp.logcatapp.services.getService
 import com.dp.logcatapp.util.PreferenceKeys
 import com.dp.logcatapp.util.ServiceBinder
-import com.dp.logcatapp.util.SuCommander
 import com.dp.logcatapp.util.containsIgnoreCase
 import com.dp.logcatapp.util.getAndroidViewModel
 import com.dp.logcatapp.util.getDefaultSharedPreferences
 import com.dp.logcatapp.util.inflateLayout
 import com.dp.logcatapp.util.showSnackbar
-import com.dp.logcatapp.util.showToast
 import com.dp.logcatapp.views.IndeterminateProgressSnackBar
 import com.dp.logger.Logger
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers.Default
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
@@ -289,14 +279,6 @@ class LogcatLiveFragment : BaseFragment(), ServiceConnection, LogsReceivedListen
       }
     }
 
-    if (!checkReadLogsPermission() && !viewModel.showedGrantPermissionInstruction) {
-      viewModel.showedGrantPermissionInstruction = true
-      NeedPermissionDialogFragment().let {
-        it.setTargetFragment(this, 0)
-        it.show(parentFragmentManager, NeedPermissionDialogFragment.TAG)
-      }
-    }
-
     viewModel.getFilters().observe(viewLifecycleOwner, Observer { filters ->
       if (filters != null) {
         logcatService?.let {
@@ -359,11 +341,6 @@ class LogcatLiveFragment : BaseFragment(), ServiceConnection, LogsReceivedListen
       }
     })
   }
-
-  private fun checkReadLogsPermission() = ContextCompat.checkSelfPermission(
-    requireContext(),
-    Manifest.permission.READ_LOGS
-  ) == PackageManager.PERMISSION_GRANTED
 
   override fun onCreateOptionsMenu(
     menu: Menu,
@@ -720,32 +697,6 @@ class LogcatLiveFragment : BaseFragment(), ServiceConnection, LogsReceivedListen
       linearLayoutManager.scrollToPositionWithOffset(0, 0)
 
       resumeLogcat()
-    }
-  }
-
-  fun useRootToGrantPermission() {
-    scope.launch {
-      val dialog = AskingForRootAccessDialogFragment()
-      dialog.show(parentFragmentManager, AskingForRootAccessDialogFragment.TAG)
-
-      val result = withContext(IO) {
-        val cmd = "pm grant ${BuildConfig.APPLICATION_ID} ${Manifest.permission.READ_LOGS}"
-        SuCommander(cmd).run()
-      }
-
-      dialog.dismissAllowingStateLoss()
-      if (result) {
-        RestartAppMessageDialogFragment.newInstance().show(
-          parentFragmentManager,
-          RestartAppMessageDialogFragment.TAG
-        )
-      } else {
-        requireActivity().showToast(getString(R.string.fail))
-        ManualMethodToGrantPermissionDialogFragment().show(
-          parentFragmentManager,
-          ManualMethodToGrantPermissionDialogFragment.TAG
-        )
-      }
     }
   }
 

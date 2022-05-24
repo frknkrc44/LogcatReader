@@ -29,7 +29,7 @@ import kotlin.concurrent.withLock
 
 class Logcat(initialCapacity: Int = INITIAL_LOG_CAPACITY) : Closeable {
   var logcatBuffers = DEFAULT_BUFFERS
-  private val logcatCmd = arrayOf("logcat", "-v", "long")
+  private val logcatCmd = arrayOf("su", "-c", "logcat", "-v", "long")
   private var pollInterval: Long = 250L // in ms
   private var threadLogcat: Thread? = null
   private var logcatProcess: Process? = null

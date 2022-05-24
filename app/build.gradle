@@ -58,7 +58,7 @@ android {
       it.addManifestPlaceholders(["fileProvider": fileProvider])
     }
     release {
-      signingConfig signingConfigs.release
+      signingConfig signingConfigs.debug
       minifyEnabled false
       shrinkResources false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
