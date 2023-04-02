@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.dp.logcatapp">
+    xmlns:tools="http://schemas.android.com/tools">
 
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -19,6 +18,7 @@
       android:theme="@style/LightTheme"
       tools:ignore="GoogleAppIndexingWarning">
     <activity
+        android:exported="true"
         android:name=".activities.SplashActivity"
         android:theme="@style/SplashScreenTheme">
       <intent-filter>
@@ -61,6 +61,7 @@
     </activity>
 
     <activity
+        android:exported="true"
         android:name=".activities.SavedLogsViewerActivity"
         android:launchMode="singleTask"
         android:parentActivityName=".activities.SavedLogsActivity"

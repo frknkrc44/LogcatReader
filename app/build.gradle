@@ -1,22 +1,23 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 
 def fileProvider = "file_provider"
 
 android {
-  compileSdkVersion 30
-  buildToolsVersion "30.0.3"
+  compileSdkVersion 33
+  buildToolsVersion "33.0.2"
 
   defaultConfig {
     applicationId "com.dp.logcatapp"
     minSdkVersion 16
-    targetSdkVersion 30
+    targetSdkVersion 33
     versionCode 34
     versionName "1.7.3"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables.useSupportLibrary = true
+    multiDexEnabled true
   }
 
   signingConfigs {
@@ -38,10 +39,6 @@ android {
     javaMaxHeapSize "2g"
   }
 
-  lintOptions {
-    abortOnError false
-    disable 'MissingTranslation'
-  }
 
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
@@ -64,6 +61,11 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+  lint {
+    abortOnError false
+    disable 'MissingTranslation'
+  }
+  namespace 'com.dp.logcatapp'
 }
 
 dependencies {
@@ -90,6 +92,7 @@ dependencies {
   kapt "androidx.room:room-compiler:$room_version"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlin_coroutines_core_version"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlin_coroutines_android_version"
+  implementation "androidx.multidex:multidex:$multidex_version"
 
   testImplementation "junit:junit:$junit_version"
   androidTestImplementation "androidx.test:runner:$runner_version"
